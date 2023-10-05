@@ -46,9 +46,10 @@ class MessageBus:
         """
         Handles an item running the correct function depending on the items type.
 
-        :param item:
+        :param item: Union[BaseCommand, BaseEvent]
         :return: Any
         """
+
         if isinstance(item, BaseEvent):
             return self._run_event_handler(event=item)
 
@@ -56,3 +57,22 @@ class MessageBus:
             return self._run_command_handler(cmd=item)
 
         raise ValueError("item doesn't inherit off a BaseCommand or EventCommand")
+
+    def handle_items(
+        self,
+        starting_item: Union[BaseCommand, BaseEvent]
+    ) -> Dict[str, Any]:
+        """
+        Handles a bunch of items adding new events to the queue.
+
+        :param starting_item: Union[BaseCommand, BaseEvent]
+        :return: Dict[str, Any]
+        """
+        queue, results = [starting_item], {}
+        while queue:
+            item = queue.pop(0)
+            results[item.__class__.__name__] = self.handle_item(item=item)
+            if self.uow is not None:
+                queue.extend(self.uow.get_events())
+
+        return results

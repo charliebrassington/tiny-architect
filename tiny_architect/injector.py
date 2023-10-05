@@ -55,12 +55,16 @@ class Injector:
         :return: MessageBus
         """
         injected_handlers = {
-            arg_name: {
+            "command_handlers": {
                 item_type: self._inject_dependencies(handler_func)
-                for item_type, handler_func in handler_dict.items()
+                for item_type, handler_func in self.message_handlers["command_handlers"].items()
+            },
+            "event_handlers": {
+                item_type: [self._inject_dependencies(handler_func) for handler_func in handler_funcs]
+                for item_type, handler_funcs in self.message_handlers["event_handlers"].items()
             }
-            for arg_name, handler_dict in self.message_handlers.items()
         }
+
 
         return self._create_message_bus(
             injected_handlers=injected_handlers

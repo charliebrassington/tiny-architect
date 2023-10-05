@@ -92,19 +92,7 @@ class TinyArchitect:
         """
         self._logger.debug(f"Handling command {cmd}")
         if isinstance(cmd, BaseCommand):
-            return self._message_bus.handle_item(item=cmd)
+            return self._message_bus.handle_items(starting_item=cmd)
 
         raise ValueError("command must inherit off a BaseClass")
 
-    def handle_event(self, event: BaseEvent) -> Any:
-        """
-        Handles the event runs the handler and returns the handler value.
-
-        :param event: BaseEvent
-        :return: Any
-        """
-        self._logger.debug(f"Handling event {event}")
-        if isinstance(event, BaseEvent):
-            return self._message_bus.handle_item(item=event)
-
-        raise ValueError("event must inherit off a BaseEvent")
